@@ -60,9 +60,6 @@ class LectureViewHolder(
 
         lectureTitle.text = lecture.name
         lectureFrom.text = lecture.orgName
-
-        val start = DateUtil.formatDate(lecture.start)
-        val end = DateUtil.formatDate(lecture.end)
-        lectureDuration.text = "$start ~ $end"
+        lectureDuration.text = DateUtil.dueString(lecture.start, lecture.end)
     }
 }
