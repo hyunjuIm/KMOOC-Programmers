@@ -52,6 +52,12 @@ class LectureViewHolder(
 
     fun bindData(lecture: Lecture) = with(binding) {
 
+        ImageLoader.loadImage(lecture.courseImage) { bitmap ->
+            bitmap?.let {
+                lectureImage.setImageBitmap(bitmap)
+            }
+        }
+
         lectureTitle.text = lecture.name
         lectureFrom.text = lecture.orgName
 
