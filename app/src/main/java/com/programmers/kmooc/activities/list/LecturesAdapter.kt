@@ -18,7 +18,12 @@ class LecturesAdapter : RecyclerView.Adapter<LectureViewHolder>() {
     var onClick: (Lecture) -> Unit = {}
 
     fun updateLectures(lectures: List<Lecture>) {
-//        this.lectures.clear()
+        this.lectures.clear()
+        this.lectures.addAll(lectures)
+        notifyDataSetChanged()
+    }
+
+    fun addLectures(lectures: List<Lecture>) {
         this.lectures.addAll(lectures)
         notifyDataSetChanged()
     }
