@@ -65,10 +65,10 @@ class KmoocRepository {
                 numPages = getInt("num_pages"),
                 previous = optString("previous"),
                 next = getString("next"),
-                lectures = getJSONArray("results").run {
+                lectures = jsonObject.getJSONArray("results").run {
                     mutableListOf<Lecture>().apply {
                         for (i in 0 until length()) {
-                            add(parseLecture(getJSONObject(i)))
+                            this.add(parseLecture(getJSONObject(i)))
                         }
                     }
                 }
