@@ -6,6 +6,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.programmers.kmooc.R
 import com.programmers.kmooc.databinding.ViewKmookListItemBinding
 import com.programmers.kmooc.models.Lecture
+import com.programmers.kmooc.network.ImageLoader
+import com.programmers.kmooc.utils.DateUtil
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class LecturesAdapter : RecyclerView.Adapter<LectureViewHolder>() {
 
@@ -14,6 +19,11 @@ class LecturesAdapter : RecyclerView.Adapter<LectureViewHolder>() {
 
     fun updateLectures(lectures: List<Lecture>) {
         this.lectures.clear()
+        this.lectures.addAll(lectures)
+        notifyDataSetChanged()
+    }
+
+    fun addLectures(lectures: List<Lecture>) {
         this.lectures.addAll(lectures)
         notifyDataSetChanged()
     }
@@ -31,9 +41,28 @@ class LecturesAdapter : RecyclerView.Adapter<LectureViewHolder>() {
 
     override fun onBindViewHolder(holder: LectureViewHolder, position: Int) {
         val lecture = lectures[position]
+        holder.bindData(lecture)
         holder.itemView.setOnClickListener { onClick(lecture) }
     }
 }
 
-class LectureViewHolder(binding: ViewKmookListItemBinding) : RecyclerView.ViewHolder(binding.root) {
+class LectureViewHolder(
+    private val binding: ViewKmookListItemBinding
+) : RecyclerView.ViewHolder(binding.root) {
+
+    fun bindData(lecture: Lecture) = with(binding) {
+
+        ImageLoader.loadImage(lecture.courseImage) { bitmap ->
+            bitmap?.let {
+                lectureImage.setImageBitmap(bitmap)
+            }
+        }
+
+        lectureTitle.text = lecture.name
+        lectureFrom.text = lecture.orgName
+
+        val start = DateUtil.formatDate(lecture.start)
+        val end = DateUtil.formatDate(lecture.end)
+        lectureDuration.text = "$start ~ $end"
+    }
 }

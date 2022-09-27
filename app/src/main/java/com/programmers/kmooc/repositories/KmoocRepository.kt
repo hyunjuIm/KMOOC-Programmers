@@ -25,6 +25,9 @@ class KmoocRepository {
             result.onSuccess {
                 completed(parseLectureList(JSONObject(it)))
             }
+            result.onFailure {
+                completed(LectureList.EMPTY)
+            }
         }
     }
 
@@ -33,6 +36,9 @@ class KmoocRepository {
         httpClient.getJson(nextPageUrl, emptyMap()) { result ->
             result.onSuccess {
                 completed(parseLectureList(JSONObject(it)))
+            }
+            result.onFailure {
+                completed(LectureList.EMPTY)
             }
         }
     }
@@ -45,16 +51,47 @@ class KmoocRepository {
             result.onSuccess {
                 completed(parseLecture(JSONObject(it)))
             }
+            result.onFailure {
+                completed(Lecture.EMPTY)
+            }
         }
     }
 
     private fun parseLectureList(jsonObject: JSONObject): LectureList {
-        //TODO: JSONObject -> LectureList 를 구현하세요
-        return LectureList.EMPTY
+        return jsonObject.getJSONObject("pagination").run {
+            LectureList(
+                count = getInt("count"),
+                numPages = getInt("num_pages"),
+                previous = getString("previous"),
+                next = getString("next"),
+                lectures = jsonObject.getJSONArray("results").run {
+                    mutableListOf<Lecture>().apply {
+                        for (i in 0 until length()) {
+                            add(parseLecture(getJSONObject(i)))
+                        }
+                    }
+                }
+            )
+        }
     }
 
     private fun parseLecture(jsonObject: JSONObject): Lecture {
-        //TODO: JSONObject -> Lecture 를 구현하세요
-        return Lecture.EMPTY
+        return jsonObject.run {
+            Lecture(
+                id = getString("id"),
+                number = getString("number"),
+                name = getString("name"),
+                classfyName = getString("classfy_name"),
+                middleClassfyName = getString("middle_classfy_name"),
+                courseImage = getJSONObject("media").getJSONObject("image").getString("small"),
+                courseImageLarge = getJSONObject("media").getJSONObject("image").getString("large"),
+                shortDescription = getString("short_description"),
+                orgName = getString("org_name"),
+                start = DateUtil.parseDate(getString("start")),
+                end = DateUtil.parseDate(getString("end")),
+                teachers = if (has("teachers")) getString("teachers") else null,
+                overview = if (has("overview")) getString("overview") else null
+            )
+        }
     }
 }
