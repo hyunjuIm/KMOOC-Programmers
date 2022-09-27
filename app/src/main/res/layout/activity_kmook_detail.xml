@@ -81,7 +81,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:paddingStart="16dp"
-                android:paddingEnd="16dp" />
+                android:paddingEnd="16dp"
+                android:visibility="gone" />
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
@@ -92,6 +93,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:visibility="gone"
-        tools:visibility="visible"/>
+        tools:visibility="visible" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
