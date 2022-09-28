@@ -1,6 +1,5 @@
 package com.programmers.kmooc.activities.detail
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isGone
@@ -22,7 +21,7 @@ class KmoocDetailActivity : AppCompatActivity() {
 
     private val courseId by lazy { intent.getStringExtra(INTENT_PARAM_COURSE_ID) }
 
-    private lateinit var binding: ActivityKmookDetailBinding
+    private val binding by lazy { ActivityKmookDetailBinding.inflate(layoutInflater) }
     private lateinit var viewModel: KmoocDetailViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,7 +32,6 @@ class KmoocDetailActivity : AppCompatActivity() {
             KmoocDetailViewModel::class.java
         )
 
-        binding = ActivityKmookDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         if (courseId == null || courseId.isEmpty()) {
@@ -47,10 +45,8 @@ class KmoocDetailActivity : AppCompatActivity() {
         viewModel.detail(courseId)
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     private fun initViews() = with(binding) {
         toolbar.setNavigationOnClickListener { finish() }
-
     }
 
     private fun observeData() = viewModel.kmoocDetailLiveData.observe(this) {
@@ -89,8 +85,14 @@ class KmoocDetailActivity : AppCompatActivity() {
             DateUtil.dueString(state.lecture.start, state.lecture.end)
         )
 
-        if (!state.lecture.overview.isNullOrBlank()) {
-            webView.loadDataWithBaseURL(null, state.lecture.overview, "text/html; charset=utf-8", "utf-8",null)
+        if (!state.lecture.overview.isNullOrEmpty()) {
+            webView.loadDataWithBaseURL(
+                null,
+                state.lecture.overview,
+                "text/html; charset=utf-8",
+                "utf-8",
+                null
+            )
             webView.isVisible = true
         }
 

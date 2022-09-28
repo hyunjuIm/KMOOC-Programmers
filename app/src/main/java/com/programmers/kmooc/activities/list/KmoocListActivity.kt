@@ -12,21 +12,18 @@ import com.programmers.kmooc.KmoocApplication
 import com.programmers.kmooc.activities.detail.KmoocDetailActivity
 import com.programmers.kmooc.databinding.ActivityKmookListBinding
 import com.programmers.kmooc.models.Lecture
-import com.programmers.kmooc.models.LectureList
 import com.programmers.kmooc.viewmodels.KmoocListViewModel
 import com.programmers.kmooc.viewmodels.KmoocListViewModelFactory
 import com.programmers.kmooc.viewmodels.state.KmoocListState
 
 class KmoocListActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityKmookListBinding
+    private val binding by lazy { ActivityKmookListBinding.inflate(layoutInflater) }
     private lateinit var viewModel: KmoocListViewModel
 
     private val adapter by lazy {
         LecturesAdapter().apply { onClick = this@KmoocListActivity::startDetailActivity }
     }
-
-    private lateinit var hasNextPage: LectureList
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,37 +33,34 @@ class KmoocListActivity : AppCompatActivity() {
             KmoocListViewModel::class.java
         )
 
-        binding = ActivityKmookListBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         observeData()
         initViews()
-
-        viewModel.list()
     }
 
     private fun initViews() = with(binding) {
-        pullToRefresh.setOnRefreshListener {
-            viewModel.list()
-        }
+        pullToRefresh.setOnRefreshListener { viewModel.list() }
 
         lectureList.adapter = adapter
         lectureList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
 
-                if (hasNextPage.next.isNotEmpty() && progressBar.isGone) {
+                if (!viewModel.hasNextPage.value?.next.isNullOrEmpty() && progressBar.isGone) {
                     val layoutManager = lectureList.layoutManager
 
                     val lastVisibleItem = (layoutManager as LinearLayoutManager)
                         .findLastCompletelyVisibleItemPosition()
 
                     if (layoutManager.itemCount <= lastVisibleItem + 5) {
-                        viewModel.next(hasNextPage)
+                        viewModel.next()
                     }
                 }
             }
         })
+
+        viewModel.list()
     }
 
     private fun observeData() = viewModel.kmoocListLiveData.observe(this) {
@@ -94,8 +88,6 @@ class KmoocListActivity : AppCompatActivity() {
         } else {
             adapter.addLectures(state.result.lectures)
         }
-
-        hasNextPage = state.result
     }
 
     private fun startDetailActivity(lecture: Lecture) {

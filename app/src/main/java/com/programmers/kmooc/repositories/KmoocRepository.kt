@@ -1,5 +1,6 @@
 package com.programmers.kmooc.repositories
 
+import com.programmers.kmooc.BuildConfig
 import com.programmers.kmooc.models.Lecture
 import com.programmers.kmooc.models.LectureList
 import com.programmers.kmooc.network.HttpClient
@@ -13,9 +14,8 @@ class KmoocRepository {
      * https://www.data.go.kr/data/15042355/openapi.do
      */
 
-    private val httpClient = HttpClient("http://apis.data.go.kr/B552881/kmooc")
-    private val serviceKey =
-        "LwG%2BoHC0C5JRfLyvNtKkR94KYuT2QYNXOT5ONKk65iVxzMXLHF7SMWcuDqKMnT%2BfSMP61nqqh6Nj7cloXRQXLA%3D%3D"
+    private val httpClient = HttpClient(KMOOC_URL)
+    private val serviceKey = BuildConfig.KMOOC_SERVICE_KEY
 
     fun list(completed: (LectureList) -> Unit) {
         httpClient.getJson(
@@ -93,5 +93,9 @@ class KmoocRepository {
                 overview = if (has("overview")) getString("overview") else null
             )
         }
+    }
+
+    companion object {
+        private const val KMOOC_URL = "http://apis.data.go.kr/B552881/kmooc"
     }
 }
