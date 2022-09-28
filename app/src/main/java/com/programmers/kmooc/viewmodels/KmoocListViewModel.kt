@@ -15,17 +15,21 @@ class KmoocListViewModel(private val repository: KmoocRepository) : ViewModel() 
         value = KmoocListState.Uninitialized
     }
 
+     val hasNextPage = MutableLiveData<LectureList>().apply { LectureList.EMPTY }
+
     fun list() = viewModelScope.launch {
         kmoocListLiveData.value = KmoocListState.Loading
         repository.list { lectureList ->
             kmoocListLiveData.postValue(KmoocListState.Success(lectureList))
+            hasNextPage.postValue(lectureList)
         }
     }
 
-    fun next(hasNextPage: LectureList) = viewModelScope.launch {
+    fun next() = viewModelScope.launch {
         kmoocListLiveData.value = KmoocListState.Loading
-        repository.next(hasNextPage) { lectureList ->
+        repository.next(hasNextPage.value!!) { lectureList ->
             kmoocListLiveData.postValue(KmoocListState.Success(lectureList))
+            hasNextPage.postValue(lectureList)
         }
     }
 }
